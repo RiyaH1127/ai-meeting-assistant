@@ -1,14 +1,11 @@
-import imageio_ffmpeg as ffmpeg
-
-# set ffmpeg path for whisper
-import os
-os.environ["PATH"] += os.pathsep + ffmpeg.get_ffmpeg_exe()
 import streamlit as st
 import whisper
 import os
+import tempfile
+import imageio_ffmpeg as ffmpeg
 
-# FFmpeg path
-os.environ["PATH"] += r";C:\Users\Jaya\Downloads\ffmpeg-8.1-essentials_build\ffmpeg-8.1-essentials_build\bin"
+# ✅ Fix FFmpeg for Streamlit Cloud
+os.environ["PATH"] += os.pathsep + ffmpeg.get_ffmpeg_exe()
 
 st.title("🎙️ AI Meeting Assistant")
 
@@ -16,16 +13,18 @@ st.title("🎙️ AI Meeting Assistant")
 audio_file = st.file_uploader("Upload Meeting Audio", type=["wav", "mp3"])
 
 if audio_file:
-    with open("temp.wav", "wb") as f:
-        f.write(audio_file.read())
-
     st.write("Processing... ⏳")
 
-    # Load model
+    # ✅ Save uploaded file safely (IMPORTANT FIX)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+        tmp.write(audio_file.read())
+        temp_path = tmp.name
+
+    # Load Whisper model
     model = whisper.load_model("base")
 
     # Transcribe
-    result = model.transcribe("temp.wav")
+    result = model.transcribe(temp_path)
     text = result["text"]
 
     # Summary
