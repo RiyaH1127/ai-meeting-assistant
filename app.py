@@ -3,7 +3,6 @@ import imageio_ffmpeg as ffmpeg
 # set ffmpeg path for whisper
 import os
 os.environ["PATH"] += os.pathsep + ffmpeg.get_ffmpeg_exe()
-
 import streamlit as st
 import whisper
 import os
